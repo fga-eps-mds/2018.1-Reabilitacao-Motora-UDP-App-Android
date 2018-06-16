@@ -1,0 +1,74 @@
+# image: openjdk:8-jdk
+image: unitedclassifiedsapps/gitlab-ci-android-fastlane
+
+cache:
+  paths:
+    - .m2/
+    - .gradle/
+
+variables:
+  ANDROID_COMPILE_SDK: "27"
+  ANDROID_BUILD_TOOLS: "27.0.3"
+  ANDROID_SDK_TOOLS: "27.1.1"
+
+stages:
+  - update
+  - build
+  - test
+  # - quality
+  # - deploy
+
+update:
+  stage: update
+  script:
+     - export GRADLE_USER_HOME=$(pwd)/.gradle
+     - chmod +x ./gradlew
+     - gem install fastlane
+
+build:
+  stage: build
+  script:
+     - ./gradlew assembleDebug
+     # - ./gradlew assembleRelease  -> For release
+  artifacts:
+    paths:
+    - app/build/outputs/
+
+testCheck:
+  stage: test
+  script:
+     - ./gradlew check
+
+unitTests:
+  stage: test
+  script:
+    - ./gradlew test
+
+# staticAnalysis:
+#   stage: quality
+#   only:
+#     - master
+#     - alpha
+#   script:
+#     - ./gradlew lint
+#   artifacts:
+#     name: "reports_${CI_PROJECT_NAME}_${CI_BUILD_REF_NAME}"
+#     when: on_failure
+#     expire_in: 4 days
+#     paths:
+#       - app/build/reports/
+#
+# playstoreProduction:
+#   stage: deploy
+#   only:
+#     - master
+#   script:
+#   - fastlane playstore_production
+#   when: manual
+#
+# playstoreAlpha:
+#   stage: deploy
+#   only:
+#     - alpha
+#   script:
+#   - fastlane playstore_alpha
