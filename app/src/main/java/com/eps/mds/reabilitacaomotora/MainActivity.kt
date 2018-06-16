@@ -1,5 +1,6 @@
 package com.eps.mds.reabilitacaomotora
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -24,11 +25,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var senAccelerometer: Sensor? = null
 
     private  var ipAddress: String = "192.168.0.27"
-    private  var port:String = "5004"
+    private  var port:String = "5005"
 
     private lateinit var ipEditText: EditText
     private lateinit var portEditText: EditText
     private lateinit var startStopSwitch: Switch
+
+    private lateinit var sensorNameTextView: TextView
+    private lateinit var sensorManufacturerTextView: TextView
+    private lateinit var sensorVersionTextView: TextView
+    private lateinit var sensorPowerTextView: TextView
+    private lateinit var sensorResolutionTextView: TextView
+    private lateinit var sensorMaximumReachTextView: TextView
+
 
     private lateinit var xAxisTextView: TextView
     private lateinit var yAxisTextView: TextView
@@ -68,6 +77,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     var rightElbowY = "0.5"
     var rightElbowZ = "0.5"
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -77,6 +87,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         portEditText = findViewById(R.id.portEditText)
         startStopSwitch = findViewById(R.id.startStopSwitch)
 
+        sensorNameTextView =  findViewById(R.id.sensorNameTextView)
+        sensorManufacturerTextView =  findViewById(R.id.sensorManufacturerTextView)
+        sensorVersionTextView =  findViewById(R.id.sensorVersionTextView)
+        sensorPowerTextView =  findViewById(R.id.sensorPowerTextView)
+        sensorResolutionTextView =  findViewById(R.id.sensorResolutionTextView)
+        sensorMaximumReachTextView =  findViewById(R.id.sensorMaximumReachTextView)
+
         xAxisTextView = findViewById(R.id.xAxisTextView)
         yAxisTextView = findViewById(R.id.yAxisTextView)
         zAxisTextView = findViewById(R.id.zAxisTextView)
@@ -84,6 +101,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         senSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager?
         senAccelerometer = senSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         senSensorManager!!.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL)
+
+        sensorNameTextView.text = senAccelerometer!!.name.toString()
+        sensorManufacturerTextView.text = senAccelerometer!!.vendor
+        sensorVersionTextView.text = senAccelerometer!!.version.toString()
+        sensorPowerTextView.text = senAccelerometer!!.power.toString() + " mA"
+        sensorResolutionTextView.text =  senAccelerometer!!.resolution.toString() + " m/s²"
+        sensorMaximumReachTextView.text =  senAccelerometer!!.maximumRange.toString() + " m/s²"
     }
 
     override fun onSensorChanged(sensorEvent: SensorEvent?) {
@@ -133,7 +157,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 var ds: DatagramSocket? = null
                 try {
                     ds = DatagramSocket()
-//                   "192.168.0.27"
                     // IP Address below is the IP address of that Device where server socket is opened.
                     val serverAddr = InetAddress.getByName(ipEditText.text.toString())
                     var dp: DatagramPacket
