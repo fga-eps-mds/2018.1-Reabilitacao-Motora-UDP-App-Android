@@ -11,6 +11,7 @@ import android.os.Handler
 import android.util.Log
 import android.widget.EditText
 import android.widget.Switch
+import android.widget.TextView
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -28,6 +29,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var ipEditText: EditText
     private lateinit var portEditText: EditText
     private lateinit var startStopSwitch: Switch
+
+    private lateinit var xAxisTextView: TextView
+    private lateinit var yAxisTextView: TextView
+    private lateinit var zAxisTextView: TextView
 
     private var time = 0
 
@@ -72,6 +77,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         portEditText = findViewById(R.id.portEditText)
         startStopSwitch = findViewById(R.id.startStopSwitch)
 
+        xAxisTextView = findViewById(R.id.xAxisTextView)
+        yAxisTextView = findViewById(R.id.yAxisTextView)
+        zAxisTextView = findViewById(R.id.zAxisTextView)
+
         senSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager?
         senAccelerometer = senSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         senSensorManager!!.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL)
@@ -84,6 +93,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             val x = sensorEvent.values[0]
             val y = sensorEvent.values[1]
             val z = sensorEvent.values[2]
+
+            xAxisTextView.text = x.toString()
+            yAxisTextView.text = y.toString()
+            zAxisTextView.text = z.toString()
 
             if(startStopSwitch.isChecked) {
                 Log.d("SENSOR", "send")

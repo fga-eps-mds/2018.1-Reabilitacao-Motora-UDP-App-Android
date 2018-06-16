@@ -138,7 +138,7 @@
                 card_view:layout_constraintTop_toBottomOf="@+id/textView4" />
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/xAxisTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -154,7 +154,7 @@
                 card_view:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView7"
+                android:id="@+id/yAxisTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -167,10 +167,10 @@
                 card_view:layout_constraintEnd_toEndOf="parent"
                 card_view:layout_constraintHorizontal_bias="0.297"
                 card_view:layout_constraintStart_toEndOf="@+id/textView4"
-                card_view:layout_constraintTop_toBottomOf="@+id/textView6" />
+                card_view:layout_constraintTop_toBottomOf="@+id/xAxisTextView" />
 
             <TextView
-                android:id="@+id/textView8"
+                android:id="@+id/zAxisTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -183,7 +183,7 @@
                 card_view:layout_constraintEnd_toEndOf="parent"
                 card_view:layout_constraintHorizontal_bias="0.294"
                 card_view:layout_constraintStart_toEndOf="@+id/textView3"
-                card_view:layout_constraintTop_toBottomOf="@+id/textView7" />
+                card_view:layout_constraintTop_toBottomOf="@+id/yAxisTextView" />
 
 
         </android.support.constraint.ConstraintLayout>
