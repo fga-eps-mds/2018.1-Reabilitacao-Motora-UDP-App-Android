@@ -135,20 +135,29 @@
                         android:background="#dedede">
                     </View>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:textSize="16dp"
+                            android:text="Envio de dados: "/>
 
                         <Switch
                             android:id="@+id/startStopSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginRight="20dp"
+                            android:layout_alignParentRight="true"
                             android:width="50dp"
                             android:height="50dp"
-                            android:checked="false"/>
+                            android:checked="false" />
 
-                    </LinearLayout>
+                    </RelativeLayout>
 
                 </LinearLayout>
 
