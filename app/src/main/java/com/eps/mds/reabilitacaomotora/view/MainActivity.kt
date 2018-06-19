@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.Switch
 import android.widget.TextView
 import com.eps.mds.reabilitacaomotora.R
+import com.eps.mds.reabilitacaomotora.model.Body
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -25,8 +26,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var senSensorManager: SensorManager? = null
     private var senAccelerometer: Sensor? = null
 
-    private  var ipAddress: String = "192.168.0.27"
-    private  var port:String = "5005"
+    private var ipAddress: String = "192.168.0.27"
+    private var port:Int = 5005
 
     private lateinit var ipEditText: EditText
     private lateinit var portEditText: EditText
@@ -44,45 +45,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var yAxisTextView: TextView
     private lateinit var zAxisTextView: TextView
 
+    private lateinit var body: Body
+
     private var time = 0
 
-    var handX = "0.5"
-    var handY = "0.5"
-    var handZ = "0.5"
-
-    var rightHandX = "0.5"
-    var rightHandY = "0.5"
-    var rightHandZ = "0.5"
-
-    var armX = "0.5"
-    var armY = "0.5"
-    var armZ = "0.5"
-
-    var rightArmX = "0.5"
-    var rightArmY = "0.5"
-    var rightArmZ = "0.5"
-
-    var sholderX = "0.5"
-    var sholderY = "0.5"
-    var sholderZ = "0.5"
-
-    var rightSholderX = "0.5"
-    var rightSholderY = "0.5"
-    var rightSholderZ = "0.5"
-
-    var elbowX = "0.5"
-    var elbowY = "0.5"
-    var elbowZ = "0.5"
-
-    var rightElbowX = "0.5"
-    var rightElbowY = "0.5"
-    var rightElbowZ = "0.5"
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        sendMessage("tchau")
 
         ipEditText = findViewById(R.id.ipEditText)
         portEditText = findViewById(R.id.portEditText)
@@ -109,6 +80,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         sensorPowerTextView.text = senAccelerometer!!.power.toString() + " mA"
         sensorResolutionTextView.text =  senAccelerometer!!.resolution.toString() + " m/s²"
         sensorMaximumReachTextView.text =  senAccelerometer!!.maximumRange.toString() + " m/s²"
+
+        body = Body()
     }
 
     override fun onSensorChanged(sensorEvent: SensorEvent?) {
@@ -125,7 +98,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
             if(startStopSwitch.isChecked) {
                 Log.d("SENSOR", "send")
-                createData(x.toString() ,y.toString(), z.toString())
+                sendData(x.toString() ,y.toString(), z.toString())
             }
 
         }
@@ -151,7 +124,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val handler = Handler()
         val thread = Thread(object : Runnable {
 
-            internal lateinit var stringData: String
+            lateinit var stringData: String
 
             override fun run() {
 
@@ -161,7 +134,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     // IP Address below is the IP address of that Device where server socket is opened.
                     val serverAddr = InetAddress.getByName(ipEditText.text.toString())
                     var dp: DatagramPacket
-                    dp = DatagramPacket(message.toByteArray(), message.length, serverAddr, 5004)
+                    dp = DatagramPacket(message.toByteArray(), message.length, serverAddr, port)
                     ds.send(dp)
 
                     val lMsg = ByteArray(1024)
@@ -188,26 +161,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         thread.start()
     }
 
-    private fun createData(x: String, y: String, z: String) {
+    private fun sendData(x: String, y: String, z: String) {
 
         time = time.plus(0.2).toInt()
-        formactData(x, y, z)
+        body.arm!!.updateArm(x, y, z)
 
-    }
+        val udpData:String = time.toString() + body.getFormattedUdpData()
 
-    private fun formactData(x: String, y: String, z: String) {
-        var message: String = time.toString() + " "
-
-        message += "$handX $handY $handZ "
-        message += "$rightHandX $rightHandY $rightHandZ "
-        message += "$sholderX $sholderY $sholderZ "
-        message += "$rightElbowX $rightElbowY $rightElbowZ "
-        message += "$sholderX $sholderY $sholderZ "
-        message += "$rightSholderX $rightSholderY $rightSholderZ "
-        message += "$x $y $z "
-        message += "$rightArmX $rightArmY $rightArmZ "
-
-        sendMessage(message)
+        sendMessage(udpData)
     }
 }
 
