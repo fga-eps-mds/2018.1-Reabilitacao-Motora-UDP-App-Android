@@ -15,10 +15,15 @@ import android.widget.Switch
 import android.widget.TextView
 import com.eps.mds.reabilitacaomotora.R
 import com.eps.mds.reabilitacaomotora.model.Body
+import org.w3c.dom.Text
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
+import android.text.method.ScrollingMovementMethod
+import com.eps.mds.reabilitacaomotora.R.id.textView
+
+
 
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -40,6 +45,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var sensorResolutionTextView: TextView
     private lateinit var sensorMaximumReachTextView: TextView
 
+    private lateinit var logTextView: TextView
+
 
     private lateinit var xAxisTextView: TextView
     private lateinit var yAxisTextView: TextView
@@ -49,8 +56,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private var time = 0
 
-
-    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -65,6 +70,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         sensorPowerTextView =  findViewById(R.id.sensorPowerTextView)
         sensorResolutionTextView =  findViewById(R.id.sensorResolutionTextView)
         sensorMaximumReachTextView =  findViewById(R.id.sensorMaximumReachTextView)
+
+        logTextView = findViewById(R.id.logTextView)
+        logTextView.movementMethod = ScrollingMovementMethod()
 
         xAxisTextView = findViewById(R.id.xAxisTextView)
         yAxisTextView = findViewById(R.id.yAxisTextView)
@@ -126,6 +134,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
             lateinit var stringData: String
 
+            @SuppressLint("SetTextI18n")
             override fun run() {
 
                 var ds: DatagramSocket? = null
@@ -150,11 +159,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     }
                 }
 
-                handler.post(Runnable {
-//                    val s = mTextViewReplyFromServer.getText().toString()
-//                    if (stringData.trim { it <= ' ' }.length != 0)
-//                        mTextViewReplyFromServer.setText(s + "\nFrom Server : " + stringData)
-                })
+                handler.post {
+                    val s = logTextView.text.toString()
+                    if (stringData.trim { it <= ' ' }.isNotEmpty())
+                        logTextView.text = s + "\nFrom Server : " + stringData
+                }
             }
         })
 
