@@ -15,8 +15,8 @@ class Body {
     }
 
     fun getFormattedUdpData(): String {
-        return hand!!.getHandFormattedData() + arm!!.getArmFormattedData() +
-                elbow!!.getElbowFormattedData() + shoulder!!.getShoulderFormattedData()
+        return hand!!.getHandFormattedData() + " " + arm!!.getArmFormattedData() + " " +
+                elbow!!.getElbowFormattedData() + " " + shoulder!!.getShoulderFormattedData()
     }
 
 }

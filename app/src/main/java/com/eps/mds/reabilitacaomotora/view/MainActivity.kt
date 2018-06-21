@@ -22,6 +22,9 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import android.text.method.ScrollingMovementMethod
 import com.eps.mds.reabilitacaomotora.R.id.textView
+import com.eps.mds.reabilitacaomotora.controller.UDP_Client
+
+
 
 
 
@@ -31,8 +34,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var senSensorManager: SensorManager? = null
     private var senAccelerometer: Sensor? = null
 
-    private var ipAddress: String = "192.168.0.27"
-    private var port:Int = 5005
+//    private var ipAddress: String = "192.168.0.27"
+//    private var port:Int = 5005
 
     private lateinit var ipEditText: EditText
     private lateinit var portEditText: EditText
@@ -52,9 +55,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var yAxisTextView: TextView
     private lateinit var zAxisTextView: TextView
 
+    private val client = UDP_Client()
+
     private lateinit var body: Body
 
-    private var time = 0
+    private var time = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +85,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         senSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager?
         senAccelerometer = senSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        senSensorManager!!.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL)
+        senSensorManager!!.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_GAME)
 
         sensorNameTextView.text = senAccelerometer!!.name.toString()
         sensorManufacturerTextView.text = senAccelerometer!!.vendor
@@ -107,6 +112,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             if(startStopSwitch.isChecked) {
                 Log.d("SENSOR", "send")
                 sendData(x.toString() ,y.toString(), z.toString())
+            }else {
+                time = 0.0
             }
 
         }
@@ -127,57 +134,61 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         senSensorManager!!.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
-    private fun sendMessage(message: String) {
-
-        val handler = Handler()
-        val thread = Thread(object : Runnable {
-
-            lateinit var stringData: String
-
-            @SuppressLint("SetTextI18n")
-            override fun run() {
-
-                var ds: DatagramSocket? = null
-                try {
-                    ds = DatagramSocket()
-                    // IP Address below is the IP address of that Device where server socket is opened.
-                    val serverAddr = InetAddress.getByName(ipEditText.text.toString())
-                    var dp: DatagramPacket
-                    dp = DatagramPacket(message.toByteArray(), message.length, serverAddr, port)
-                    ds.send(dp)
-
-                    val lMsg = ByteArray(1024)
-                    dp = DatagramPacket(lMsg, lMsg.size)
-                    ds.receive(dp)
-                    stringData = String(lMsg, 0, dp.length)
-
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                } finally {
-                    if (ds != null) {
-                        ds.close()
-                    }
-                }
-
-                handler.post {
-                    val s = logTextView.text.toString()
-                    if (stringData.trim { it <= ' ' }.isNotEmpty())
-                        logTextView.text = s + "\nFrom Server : " + stringData
-                }
-            }
-        })
-
-        thread.start()
-    }
+//    private fun sendMessage(message: String) {
+//
+//        val handler = Handler()
+//        val thread = Thread(object : Runnable {
+//
+//            lateinit var stringData: String
+//
+//            @SuppressLint("SetTextI18n")
+//            override fun run() {
+//
+//                var ds: DatagramSocket? = null
+//                try {
+//                    ds = DatagramSocket()
+//                    // IP Address below is the IP address of that Device where server socket is opened.
+//                    val serverAddr = InetAddress.getByName(ipEditText.text.toString())
+//                    var dp: DatagramPacket
+//                    dp = DatagramPacket(message.toByteArray(), message.length, serverAddr, port)
+//                    ds.send(dp)
+//
+//                    val lMsg = ByteArray(1024)
+//                    dp = DatagramPacket(lMsg, lMsg.size)
+//                    ds.receive(dp)
+//                    stringData = String(lMsg, 0, dp.length)
+//
+//                } catch (e: IOException) {
+//                    e.printStackTrace()
+//                } finally {
+//                    if (ds != null) {
+//                        ds.close()
+//                    }
+//                }
+//
+//                handler.post {
+//                    Log.d("teste", "teste")
+//                    val s = logTextView.text.toString()
+//                    if (stringData.trim { it <= ' ' }.isNotEmpty())
+//                        logTextView.text = s + "\nFrom Server : " + stringData
+//                }
+//            }
+//        })
+//
+//        thread.start()
+//    }
 
     private fun sendData(x: String, y: String, z: String) {
 
-        time = time.plus(0.2).toInt()
-        body.arm!!.updateArm(x, y, z)
+        time = time.plus(0.2)
+        body.arm!!.updateArm(x.toDouble(), y.toDouble(), z.toDouble())
 
-        val udpData:String = time.toString() + body.getFormattedUdpData()
+        val udpData:String = time.toString() + " " + body.getFormattedUdpData() + " "
 
-        sendMessage(udpData)
+//        sendMessage(udpData)
+
+        client.setMessage(udpData)
+        client.sendMessage(ipEditText.text.toString(), Integer.parseInt(portEditText.text.toString()))
     }
 }
 
